@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Nhật ký">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="theme-color" content="#ffb7d1">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" href="icon-192.png">
+<title>Nhật ký của mình</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Itim&family=Dancing+Script:wght@600&family=Quicksand:wght@500;700&display=swap">
+<style>
+:root{--bg1:#ffe9f1;--bg2:#e6f0ff;--fg:#4a3b47;--card:#ffffffcc;--muted:#8d7a88;--accent:#ff7aa8;--line:#f3d3e0;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg1:#2a2030;--bg2:#1d2438;--fg:#f4e8f0;--card:#3a2f45cc;--muted:#b9a5b6;--accent:#ff8fb6;--line:#5a4560}}
+:root[data-theme="dark"]{--bg1:#2a2030;--bg2:#1d2438;--fg:#f4e8f0;--card:#3a2f45cc;--muted:#b9a5b6;--accent:#ff8fb6;--line:#5a4560}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}[hidden]{display:none!important}
+body{margin:0;min-height:100vh;background:linear-gradient(160deg,var(--bg1),var(--bg2));background-color:var(--bg1);color:var(--fg);font-family:Quicksand,system-ui,sans-serif}
+.wrap{max-width:900px;margin:0 auto;padding:14px 14px 40px}
+h1{font-family:"Dancing Script",cursive;font-size:2.3rem;margin:4px 0;text-align:center;color:var(--accent)}
+h2{font-size:1.05rem;margin:0 0 8px;text-align:center}
+.card{background:var(--card);border-radius:18px;padding:12px;margin:10px 0;box-shadow:0 4px 16px #0000001a}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:center}
+button,select,input{font:inherit;color:var(--fg);background:var(--card);border:2px solid var(--line);border-radius:12px;padding:8px 14px;cursor:pointer}
+input{cursor:text}button:hover{border-color:var(--accent)}
+button.on{border-color:var(--accent);background:var(--line)}
+.date{font-weight:700;text-align:center;margin:4px 0;text-transform:capitalize}
+.moods button{font-size:1.5rem;padding:2px 8px;border-radius:50%}
+.sw,.col{width:30px;height:30px;border-radius:50%;padding:0;border:3px solid #fff}
+.sw.on,.col.on{outline:3px solid var(--accent);transform:scale(1.12)}
+#page{position:relative;height:660px;display:flex;flex-direction:column;border-radius:14px;padding-top:16px;border:2px solid var(--line);color:#4a3b47;overflow:hidden;transition:background .3s}
+#page::before{content:"";position:absolute;top:-6px;left:50%;width:120px;height:26px;margin-left:-60px;background:repeating-linear-gradient(45deg,#ffb7d1aa 0 8px,#fff8 8px 16px);transform:rotate(-2deg);z-index:4}
+.p-cream{background:#fff8e7}.p-pink{background:#ffe4ee}.p-mint{background:#e3f6ec}.p-sky{background:#e2f0ff}.p-lav{background:#eee6ff}
+.f-itim{font-family:Itim,cursive}.f-dance{font-family:"Dancing Script",cursive}.f-quick{font-family:Quicksand,sans-serif}
+#title{width:100%;border:0;border-radius:0;background:transparent;font:inherit;font-size:1.6rem;font-weight:700;padding:8px 16px;color:#4a3b47;outline:none}
+#text{flex:1;display:block;width:100%;border:0;border-radius:0;outline:none;resize:none;background:repeating-linear-gradient(transparent,transparent 31px,#0000001f 31px,#0000001f 32px) local;font:inherit;font-size:1.25rem;line-height:32px;padding:0 16px;color:#4a3b47}
+#cv,#layer{position:absolute;inset:0;width:100%;height:100%}
+#cv{z-index:2;pointer-events:none;touch-action:none;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+#layer{z-index:3;pointer-events:none}
+.st{position:absolute;transform:translate(-50%,-50%);cursor:grab;pointer-events:auto;touch-action:none;user-select:none;-webkit-user-select:none;filter:drop-shadow(0 2px 2px #0003);border-radius:8px}
+.st svg{display:block;width:100%;height:auto;pointer-events:none}
+.st.sel{outline:2px dashed var(--accent);outline-offset:3px}
+#page.draw .st{pointer-events:none}
+.pal{display:flex;flex-wrap:wrap;gap:6px;justify-content:center}
+.pal button{padding:4px;border-radius:12px;height:50px;display:flex;align-items:center}
+.pal svg{height:100%;width:auto;max-width:90px}
+.hint{color:var(--muted);font-size:.85rem;text-align:center;margin:6px 0 0}
+.list button{display:flex;gap:8px;width:100%;text-align:left;margin:4px 0;align-items:center}
+.list b{flex:none}.list span{overflow:hidden;white-space:nowrap;text-overflow:ellipsis;color:var(--muted)}
+#lock{position:fixed;inset:0;z-index:99;display:flex;align-items:center;justify-content:center;background:linear-gradient(160deg,var(--bg1),var(--bg2));background-color:var(--bg1);color:var(--fg)}
+.lockbox{width:min(92vw,360px);text-align:center}
+.lockbox input{width:100%;margin:6px 0;padding:12px;font-size:1.1rem;text-align:center}
+.lockbox button{width:100%;margin-top:6px}
+.lockbox .big{font-size:3.2rem}
+.link{background:none;border:0;color:var(--muted);font-size:.8rem;text-decoration:underline}
+details summary{cursor:pointer;font-weight:700;text-align:center}
+#rs{width:100%;margin:8px 0;border-radius:12px;border:2px solid var(--line);background:var(--card);color:var(--fg);font:inherit;padding:8px}
+</style>
+</head>
+<body>
+
+<div id="lock" hidden>
+  <div class="lockbox">
+    <div class="big">🔒</div>
+    <h1>Nhật ký của mình</h1>
+    <p id="lockMsg" class="hint"></p>
+    <input id="pw1" type="password" placeholder="Mật khẩu" autocomplete="off">
+    <input id="pw2" type="password" placeholder="Nhập lại mật khẩu" autocomplete="off" hidden>
+    <button id="lockGo" class="on">Mở nhật ký</button>
+    <p id="lockErr" class="hint"></p>
+    <button id="forgot" class="link" hidden>Quên mật khẩu?</button>
+  </div>
+</div>
+
+<div class="wrap" id="app" hidden>
+  <h1>Nhật ký của mình 🌸</h1>
+
+  <div class="card">
+    <div class="row">
+      <button id="prev">◀</button><input type="date" id="date"><button id="next">▶</button>
+      <button id="todayBtn">Hôm nay</button><button id="lockBtn">🔒 Khoá</button>
+    </div>
+    <div class="date" id="dlabel"></div>
+  </div>
+
+  <div class="card">
+    <div class="row moods" id="moods"></div>
+    <div class="row" style="margin-top:10px">
+      <span id="papers" class="row"></span>
+      <select id="font"><option value="itim">Chữ Itim</option><option value="dance">Chữ bay bổng</option><option value="quick">Chữ gọn gàng</option></select>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="row">
+      <button id="mType" class="on">⌨️ Gõ và sticker</button><button id="mPen">✏️ Viết tay</button><button id="mErase">🧽 Tẩy nét</button><button id="undoS">↩ Hoàn tác nét</button>
+    </div>
+    <div class="row" id="cols" style="margin-top:10px"></div>
+    <div class="row" id="sizes" style="margin-top:8px"></div>
+    <div class="row" style="margin-top:8px"><label><input type="checkbox" id="finger" style="padding:0"> Cho phép vẽ bằng ngón tay</label></div>
+    <p class="hint">Khi đang ở chế độ viết tay, trang sẽ đứng yên để nét không bị lệch. Muốn cuộn trang, hãy quay về ⌨️ Gõ và sticker.</p>
+  </div>
+
+  <div id="page" class="p-cream f-itim">
+    <input id="title" placeholder="Tiêu đề hôm nay…" maxlength="80">
+    <textarea id="text" placeholder="Hôm nay của bạn thế nào?"></textarea>
+    <canvas id="cv"></canvas>
+    <div id="layer"></div>
+  </div>
+  <p class="hint">Kéo sticker để di chuyển, chạm để chọn rồi phóng to, thu nhỏ hoặc xoá</p>
+
+  <div class="card">
+    <h2>Bộ sticker riêng ✨</h2>
+    <div class="pal" id="pal"></div>
+    <div class="row" style="margin-top:8px"><button id="big">➕ Lớn hơn</button><button id="small">➖ Nhỏ hơn</button><button id="del">🗑 Xoá sticker đang chọn</button></div>
+  </div>
+
+  <div class="card list"><h2>Những trang đã viết 📖</h2><div id="list"></div></div>
+
+  <details class="card">
+    <summary>⚙️ Cài đặt và sao lưu</summary>
+    <div class="row" style="margin-top:10px"><input id="op" type="password" placeholder="Mật khẩu cũ"><input id="np" type="password" placeholder="Mật khẩu mới"><button id="chg">Đổi mật khẩu</button></div>
+    <div class="row" style="margin-top:10px"><button id="bk">📋 Tạo bản sao lưu</button><button id="rsb">♻️ Khôi phục từ ô bên dưới</button></div>
+    <textarea id="rs" rows="3" placeholder="Bản sao lưu hiện ở đây. Dán bản sao lưu cũ vào để khôi phục."></textarea>
+    <p id="msg" class="hint"></p>
+  </details>
+</div>
+
+<script>
+function $(s){return document.querySelector(s)}
+function pad(n){return String(n).padStart(2,"0")}
+function dstr(d){return d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate())}
+
+/* ---------- Bộ sticker riêng (vẽ bằng SVG) ---------- */
+function F(x,y){return `<circle cx="${x-5}" cy="${y}" r="1.8" fill="#4a3b47"/><circle cx="${x+5}" cy="${y}" r="1.8" fill="#4a3b47"/><ellipse cx="${x-9}" cy="${y+4}" rx="3" ry="2" fill="#ff9fbd" opacity=".7"/><ellipse cx="${x+9}" cy="${y+4}" rx="3" ry="2" fill="#ff9fbd" opacity=".7"/><path d="M${x-2} ${y+3}q2 2 4 0" stroke="#4a3b47" stroke-width="1.3" fill="none" stroke-linecap="round"/>`}
+function FL(a,b){var s="";for(var i=0;i<6;i++)s+=`<circle cx="24" cy="11" r="8" fill="${a}" transform="rotate(${i*60} 24 24)"/>`;return s+`<circle cx="24" cy="24" r="7" fill="${b}"/>`}
+function SUN(){var s="";for(var i=0;i<8;i++)s+=`<rect x="22.5" y="2" width="3" height="8" rx="1.5" fill="#ffb938" transform="rotate(${i*45} 24 24)"/>`;return s+`<circle cx="24" cy="24" r="11" fill="#ffd24d"/>`+F(24,24)}
+function TAPE(c){return [`<rect x="4" y="4" width="88" height="20" fill="${c}" opacity=".85"/><path d="M4 14h88" stroke="#fff" stroke-width="10" stroke-dasharray="4 8" opacity=".45"/>`,"0 0 96 28"]}
+function LAB(t,c){return [`<rect x="2" y="4" width="96" height="32" rx="16" fill="${c}" stroke="#fff" stroke-width="2"/><text x="50" y="26" text-anchor="middle" font-size="16" font-family="Itim,cursive" fill="#4a3b47">${t}</text>`,"0 0 100 40"]}
+var ST={
+heart:[`<path d="M24 42C8 30 5 20 11 13c5-5 11-3 13 2 2-5 8-7 13-2 6 7 3 17-13 29z" fill="#ff7aa8"/><ellipse cx="15" cy="17" rx="3" ry="2" fill="#fff" opacity=".6"/>`],
+star:[`<polygon points="24,4 30,18 45,19 34,29 37,44 24,36 11,44 14,29 3,19 18,18" fill="#ffd24d" stroke="#f0a800" stroke-width="2" stroke-linejoin="round"/>`],
+spark:[`<path d="M24 2c2 12 10 20 22 22-12 2-20 10-22 22-2-12-10-20-22-22 12-2 20-10 22-22z" fill="#fff1a0" stroke="#f5c542" stroke-width="2"/>`],
+cloud:[`<g fill="#cfe8ff"><circle cx="16" cy="28" r="9"/><circle cx="28" cy="23" r="11"/><circle cx="37" cy="30" r="7"/><rect x="14" y="28" width="26" height="9" rx="4"/></g>`+F(26,29)],
+sun:[SUN()],
+moon:[`<path d="M30 5A19 19 0 1 0 43 32 15 15 0 0 1 30 5z" fill="#ffe08a" stroke="#f2c14e" stroke-width="2"/><circle cx="14" cy="20" r="1.8" fill="#4a3b47"/><path d="M12 27q3 2 5 0" stroke="#4a3b47" stroke-width="1.3" fill="none"/>`],
+rose:[FL("#ffb7d1","#ffd24d")],
+lilac:[FL("#cdb4ff","#fff3b0")],
+cat:[`<polygon points="10,22 11,6 23,15" fill="#ffd9b3"/><polygon points="38,22 37,6 25,15" fill="#ffd9b3"/><ellipse cx="24" cy="28" rx="16" ry="13" fill="#ffd9b3"/><polygon points="13,18 13,10 19,15" fill="#ffb7c5"/><polygon points="35,18 35,10 29,15" fill="#ffb7c5"/>`+F(24,28)+`<path d="M5 28h7M5 33l7-2M43 28h-7M43 33l-7-2" stroke="#b58a63" stroke-width="1.2"/>`],
+bunny:[`<ellipse cx="17" cy="13" rx="5" ry="11" fill="#fff" stroke="#f1d3df" stroke-width="1.5"/><ellipse cx="31" cy="13" rx="5" ry="11" fill="#fff" stroke="#f1d3df" stroke-width="1.5"/><ellipse cx="17" cy="14" rx="2.3" ry="7" fill="#ffc2d4"/><ellipse cx="31" cy="14" rx="2.3" ry="7" fill="#ffc2d4"/><circle cx="24" cy="31" r="14" fill="#fff" stroke="#f1d3df" stroke-width="1.5"/>`+F(24,31)],
+bear:[`<circle cx="10" cy="14" r="6" fill="#d9a77b"/><circle cx="38" cy="14" r="6" fill="#d9a77b"/><circle cx="24" cy="27" r="16" fill="#d9a77b"/><ellipse cx="24" cy="32" rx="7" ry="5" fill="#f3dcc2"/>`+F(24,27)],
+rainbow:[`<path d="M5 36a19 19 0 0 1 38 0" stroke="#ff8fa3" stroke-width="5" fill="none"/><path d="M10 36a14 14 0 0 1 28 0" stroke="#ffd66b" stroke-width="5" fill="none"/><path d="M15 36a9 9 0 0 1 18 0" stroke="#8ecbff" stroke-width="5" fill="none"/><circle cx="8" cy="38" r="5" fill="#fff" stroke="#cfe0ee"/><circle cx="40" cy="38" r="5" fill="#fff" stroke="#cfe0ee"/>`],
+berry:[`<path d="M24 44C10 36 8 22 12 16c4-3 8-1 12 0 4-1 8-3 12 0 4 6 2 20-12 28z" fill="#ff6b81"/><polygon points="14,14 24,9 34,14 28,20 20,20" fill="#6fd08c"/><g fill="#ffe3e8"><ellipse cx="17" cy="26" rx="1.4" ry="2"/><ellipse cx="25" cy="30" rx="1.4" ry="2"/><ellipse cx="32" cy="25" rx="1.4" ry="2"/><ellipse cx="22" cy="38" rx="1.4" ry="2"/></g>`],
+boba:[`<rect x="28" y="3" width="3.5" height="18" rx="1.7" fill="#ff7aa8" transform="rotate(10 30 12)"/><path d="M12 18h24l-3 25H15z" fill="#fff" stroke="#c9a27e" stroke-width="1.5"/><path d="M13.5 24h21l-1.5 19H15z" fill="#e8c9a0"/><rect x="10" y="14" width="28" height="5" rx="2.5" fill="#ffb7d1"/><g fill="#5a4048"><circle cx="19" cy="40" r="2.4"/><circle cx="25" cy="40" r="2.4"/><circle cx="31" cy="40" r="2.4"/><circle cx="22" cy="36" r="2.4"/><circle cx="28" cy="36" r="2.4"/></g>`],
+cake:[`<path d="M12 28h24l-3 14H15z" fill="#ffb7d1"/><path d="M10 28c0-8 6-10 14-16 8 6 14 8 14 16z" fill="#fff3c9" stroke="#f2d98a" stroke-width="1.5"/><circle cx="24" cy="10" r="3.5" fill="#ff4d6d"/>`],
+fly:[`<ellipse cx="14" cy="18" rx="10" ry="9" fill="#c9b6ff"/><ellipse cx="34" cy="18" rx="10" ry="9" fill="#c9b6ff"/><ellipse cx="17" cy="32" rx="7" ry="7" fill="#ffb7d1"/><ellipse cx="31" cy="32" rx="7" ry="7" fill="#ffb7d1"/><rect x="22.5" y="12" width="3" height="26" rx="1.5" fill="#6b5876"/><path d="M23 12q-3-6-6-7M25 12q3-6 6-7" stroke="#6b5876" fill="none"/>`],
+bow:[`<polygon points="24,24 5,11 5,37" fill="#ff7aa8"/><polygon points="24,24 43,11 43,37" fill="#ff7aa8"/><circle cx="24" cy="24" r="6" fill="#ff4d7d"/>`],
+clover:[`<g fill="#6fd08c"><circle cx="17" cy="17" r="9"/><circle cx="31" cy="17" r="9"/><circle cx="17" cy="30" r="9"/><circle cx="31" cy="30" r="9"/></g><path d="M24 30q2 9 8 13" stroke="#4aa86a" stroke-width="3" fill="none" stroke-linecap="round"/>`],
+mail:[`<rect x="5" y="11" width="38" height="27" rx="4" fill="#fff" stroke="#f0b9cc" stroke-width="2"/><path d="M5 14l19 15 19-15" fill="none" stroke="#f0b9cc" stroke-width="2"/><path d="M24 36c-4-3-5-5-3-7s3 0 3 1c0-1 2-3 3-1s1 4-3 7z" fill="#ff6b81"/>`],
+tape1:TAPE("#ffc2d9"),tape2:TAPE("#bfead2"),tape3:TAPE("#ffe9a0"),
+lab1:LAB("hôm nay","#ffe0ec"),lab2:LAB("biết ơn","#e0f5e9"),lab3:LAB("cố lên","#fff0c2"),lab4:LAB("yêu mình","#e6dcff")
+};
+function svg(k){var d=ST[k];return `<svg viewBox="${d[1]||"0 0 48 48"}">${d[0]}</svg>`}
+
+/* ---------- Lưu trữ ---------- */
+var KEY="diary:v2",PWK="diary:pw",db={};
+try{db=JSON.parse(localStorage.getItem(KEY)||localStorage.getItem("diary:v1")||"{}")}catch(e){db={}}
+function persist(){try{localStorage.setItem(KEY,JSON.stringify(db))}catch(e){}}
+var cur=dstr(new Date()),sel=null;
+var DEF={title:"",text:"",mood:"",paper:"cream",font:"itim",stickers:[],strokes:[]};
+function get(){var e=db[cur];if(e){e.stickers=e.stickers||[];e.strokes=e.strokes||[]}return e||DEF}
+function edit(){if(!db[cur])db[cur]=JSON.parse(JSON.stringify(DEF));return get()}
+
+/* ---------- Khoá mật khẩu ---------- */
+function sha(s){
+  if(window.crypto&&crypto.subtle){return crypto.subtle.digest("SHA-256",new TextEncoder().encode("nk|"+s)).then(function(h){return Array.from(new Uint8Array(h)).map(function(x){return x.toString(16).padStart(2,"0")}).join("")})}
+  return Promise.resolve("b"+btoa(unescape(encodeURIComponent("nk|"+s))));
+}
+function hasPw(){try{return !!localStorage.getItem(PWK)}catch(e){return false}}
+function lock(){
+  $("#app").hidden=true;$("#lock").hidden=false;$("#pw1").value="";$("#pw2").value="";$("#lockErr").textContent="";
+  var s=!hasPw();$("#pw2").hidden=!s;$("#forgot").hidden=s;$("#forgot").textContent="Quên mật khẩu?";
+  $("#lockMsg").textContent=s?"Lần đầu dùng: hãy đặt mật khẩu cho nhật ký (ít nhất 4 ký tự)":"Nhập mật khẩu để vào nhật ký";
+  $("#lockGo").textContent=s?"Đặt mật khẩu và vào":"Mở nhật ký";
+}
+function open(){$("#lock").hidden=true;$("#app").hidden=false;render();fit()}
+$("#lockGo").onclick=function(){
+  var a=$("#pw1").value;
+  if(!hasPw()){
+    if(a.length<4){$("#lockErr").textContent="Mật khẩu cần ít nhất 4 ký tự";return}
+    if(a!==$("#pw2").value){$("#lockErr").textContent="Hai lần nhập chưa giống nhau";return}
+    sha(a).then(function(h){try{localStorage.setItem(PWK,h)}catch(e){}open()});
+  }else{
+    sha(a).then(function(h){if(h===localStorage.getItem(PWK))open();else $("#lockErr").textContent="Sai mật khẩu, thử lại nhé"});
+  }
+};
+$("#pw1").onkeydown=$("#pw2").onkeydown=function(e){if(e.key==="Enter")$("#lockGo").click()};
+$("#forgot").onclick=function(){
+  if(this.textContent.indexOf("Bấm lần nữa")<0){this.textContent="Bấm lần nữa: xoá toàn bộ nhật ký và đặt lại";return}
+  try{localStorage.removeItem(PWK);localStorage.removeItem(KEY);localStorage.removeItem("diary:v1")}catch(e){}
+  db={};lock();
+};
+$("#lockBtn").onclick=lock;
+document.addEventListener("visibilitychange",function(){if(document.hidden&&hasPw()&&!$("#app").hidden)lock()});
+$("#chg").onclick=function(){
+  var o=$("#op").value,n=$("#np").value;
+  if(n.length<4){$("#msg").textContent="Mật khẩu mới cần ít nhất 4 ký tự";return}
+  sha(o).then(function(h){
+    if(h!==localStorage.getItem(PWK)){$("#msg").textContent="Mật khẩu cũ chưa đúng";return}
+    sha(n).then(function(h2){localStorage.setItem(PWK,h2);$("#op").value=$("#np").value="";$("#msg").textContent="Đã đổi mật khẩu ✅"});
+  });
+};
+$("#bk").onclick=function(){
+  var t=JSON.stringify(db);$("#rs").value=t;$("#rs").select();
+  try{navigator.clipboard.writeText(t).then(function(){$("#msg").textContent="Đã sao chép bản sao lưu, hãy dán vào Ghi chú để giữ nhé ✅"},function(){$("#msg").textContent="Hãy chọn và sao chép nội dung trong ô bên dưới"})}catch(e){$("#msg").textContent="Hãy chọn và sao chép nội dung trong ô bên dưới"}
+};
+$("#rsb").onclick=function(){
+  try{var o=JSON.parse($("#rs").value);if(!o||typeof o!=="object")throw 0;db=o;persist();render();fit();$("#msg").textContent="Đã khôi phục nhật ký ✅"}catch(e){$("#msg").textContent="Bản sao lưu chưa hợp lệ"}
+};
+
+/* ---------- Giao diện ---------- */
+var MOODS=["🥰","😊","🤩","😴","😢","😡"];
+var PAPERS={cream:"#fff8e7",pink:"#ffe4ee",mint:"#e3f6ec",sky:"#e2f0ff",lav:"#eee6ff"};
+var COLS=["#4a3b47","#ff5d8f","#ff9f43","#f5c542","#4bbf7e","#4aa3ff","#8b6bff","#8b5e3c"];
+var mode="type",color=COLS[0],size=3,finger=false;
+MOODS.forEach(function(m){var b=document.createElement("button");b.textContent=m;b.onclick=function(){var e=edit();e.mood=e.mood===m?"":m;persist();render()};$("#moods").appendChild(b)});
+Object.keys(PAPERS).forEach(function(k){var b=document.createElement("button");b.className="sw";b.dataset.k=k;b.style.background=PAPERS[k];b.onclick=function(){edit().paper=k;persist();render()};$("#papers").appendChild(b)});
+COLS.forEach(function(c,i){var b=document.createElement("button");b.className="col"+(i?"":" on");b.style.background=c;b.onclick=function(){color=c;document.querySelectorAll(".col").forEach(function(x){x.classList.toggle("on",x===b)});if(mode==="erase")setMode("pen")};$("#cols").appendChild(b)});
+[[2,"12px"],[4,"20px"],[8,"30px"]].forEach(function(z,i){var b=document.createElement("button");b.className=i===1?"on":"";b.innerHTML='<span style="font-size:'+z[1]+';line-height:1">●</span>';b.onclick=function(){size=z[0];Array.from($("#sizes").children).forEach(function(x){x.classList.toggle("on",x===b)})};$("#sizes").appendChild(b);if(i===1)size=4});
+Object.keys(ST).forEach(function(k){var b=document.createElement("button");b.innerHTML=svg(k);b.onclick=function(){var e=edit(),s={k:k,x:.2+Math.random()*.6,y:.2+Math.random()*.5,z:1};e.stickers.push(s);sel=s;persist();renderStickers()};$("#pal").appendChild(b)});
+
+function renderStickers(){
+  var L=$("#layer");L.innerHTML="";
+  get().stickers.forEach(function(s){
+    var el=document.createElement("div");el.className="st"+(s===sel?" sel":"");
+    var z=s.z||1;
+    if(s.k&&ST[s.k]){el.style.width=(ST[s.k][1]?100:56)*z+"px";el.innerHTML=svg(s.k)}else{el.textContent=s.e||"";el.style.fontSize=42*z+"px"}
+    el.style.left=s.x*100+"%";el.style.top=s.y*100+"%";
+    el.onpointerdown=function(ev){
+      sel=s;document.querySelectorAll(".st").forEach(function(x){x.classList.toggle("sel",x===el)});
+      el.setPointerCapture(ev.pointerId);var r=L.getBoundingClientRect();
+      el.onpointermove=function(m){s.x=Math.min(1,Math.max(0,(m.clientX-r.left)/r.width));s.y=Math.min(1,Math.max(0,(m.clientY-r.top)/r.height));el.style.left=s.x*100+"%";el.style.top=s.y*100+"%"};
+      el.onpointerup=function(){el.onpointermove=null;persist()};
+    };
+    L.appendChild(el);
+  });
+}
+function bump(f){if(!sel)return;sel.z=Math.min(3,Math.max(.4,(sel.z||1)*f));persist();renderStickers()}
+$("#big").onclick=function(){bump(1.2)};$("#small").onclick=function(){bump(1/1.2)};
+$("#del").onclick=function(){if(!sel)return;var a=edit().stickers,i=a.indexOf(sel);if(i>=0)a.splice(i,1);sel=null;persist();renderStickers()};
+
+/* ---------- Viết tay bằng bút ---------- */
+var cv=$("#cv"),cx=cv.getContext("2d"),cur_s=null,erasing=false;
+function fit(){var w=cv.clientWidth,h=cv.clientHeight,d=window.devicePixelRatio||1;if(!w)return;cv.width=Math.round(w*d);cv.height=Math.round(h*d);cx.setTransform(cv.width/w,0,0,cv.height/h,0,0);redraw()}
+function seg(s,i,w){var k=w/800,a=s.p[i-1]||s.p[i],b=s.p[i];cx.strokeStyle=s.c;cx.lineCap="round";cx.lineWidth=s.w*k*(.5+b[2]);cx.beginPath();cx.moveTo(a[0]*w,a[1]*cv.clientHeight);cx.lineTo(b[0]*w,b[1]*cv.clientHeight);cx.stroke()}
+function redraw(){var w=cv.clientWidth;cx.clearRect(0,0,w,cv.clientHeight);get().strokes.forEach(function(s){for(var i=0;i<s.p.length;i++)seg(s,i,w)})}
+function pt(e){var r=cv.getBoundingClientRect();return [Math.round((e.clientX-r.left)/r.width*1e3)/1e3,Math.round((e.clientY-r.top)/r.height*1e3)/1e3,e.pointerType==="pen"?(e.pressure||.5):.5]}
+function ok(e){return e.pointerType!=="touch"||finger}
+function eraseAt(e){
+  var r=cv.getBoundingClientRect(),px=e.clientX-r.left,py=e.clientY-r.top,a=get().strokes,n=a.length;
+  var keep=a.filter(function(s){return !s.p.some(function(q){return Math.hypot(q[0]*r.width-px,q[1]*r.height-py)<16})});
+  if(keep.length!==n){edit().strokes=keep;redraw()}
+}
+cv.onpointerdown=function(e){
+  if(!ok(e))return;cv.setPointerCapture(e.pointerId);
+  if(mode==="erase"){erasing=true;eraseAt(e);return}
+  cur_s={c:color,w:size,p:[pt(e)]};edit().strokes.push(cur_s);seg(cur_s,0,cv.clientWidth);
+};
+cv.onpointermove=function(e){
+  if(erasing){eraseAt(e);return}
+  if(!cur_s)return;var ev=e.getCoalescedEvents?e.getCoalescedEvents():[e];if(!ev.length)ev=[e];ev.forEach(function(q){cur_s.p.push(pt(q));seg(cur_s,cur_s.p.length-1,cv.clientWidth)});
+};
+cv.onpointerup=cv.onpointercancel=function(){if(cur_s||erasing)persist();cur_s=null;erasing=false};
+$("#undoS").onclick=function(){edit().strokes.pop();persist();redraw()};
+cv.addEventListener("touchmove",function(e){if(mode!=="type")e.preventDefault()},{passive:false});
+$("#finger").onchange=function(){finger=this.checked};
+function setMode(m){
+  mode=m;var d=m!=="type";
+  $("#page").classList.toggle("draw",d);cv.style.pointerEvents=d?"auto":"none";cv.style.touchAction="none";
+  [["#mType","type"],["#mPen","pen"],["#mErase","erase"]].forEach(function(x){$(x[0]).classList.toggle("on",x[1]===m)});
+}
+$("#mType").onclick=function(){setMode("type")};$("#mPen").onclick=function(){setMode("pen")};$("#mErase").onclick=function(){setMode("erase")};
+if(window.ResizeObserver)new ResizeObserver(fit).observe($("#page"));
+
+/* ---------- Hiển thị trang ---------- */
+function render(){
+  var e=get(),d=new Date(cur+"T00:00:00");sel=null;
+  $("#date").value=cur;
+  $("#dlabel").textContent=d.toLocaleDateString("vi-VN",{weekday:"long",day:"numeric",month:"numeric",year:"numeric"});
+  $("#title").value=e.title;$("#text").value=e.text;$("#font").value=e.font;
+  $("#page").className="p-"+e.paper+" f-"+e.font+(mode!=="type"?" draw":"");
+  document.querySelectorAll("#moods button").forEach(function(b){b.classList.toggle("on",b.textContent===e.mood)});
+  document.querySelectorAll(".sw").forEach(function(b){b.classList.toggle("on",b.dataset.k===e.paper)});
+  renderStickers();redraw();renderList();
+}
+function renderList(){
+  var L=$("#list");L.innerHTML="";
+  var ks=Object.keys(db).filter(function(k){var e=db[k];return e.title||e.text||(e.stickers&&e.stickers.length)||(e.strokes&&e.strokes.length)||e.mood}).sort().reverse();
+  if(!ks.length){L.innerHTML='<p class="hint">Chưa có trang nào, hãy viết trang đầu tiên nhé 💕</p>';return}
+  ks.forEach(function(k){
+    var e=db[k],b=document.createElement("button"),p=k.split("-");
+    b.innerHTML="<b></b><span></span>";
+    b.firstChild.textContent=(e.mood||"📝")+" "+p[2]+"/"+p[1]+"/"+p[0];
+    b.lastChild.textContent=e.title||(e.text||"").slice(0,60)||(e.strokes&&e.strokes.length?"(trang viết tay)":"");
+    b.onclick=function(){cur=k;render();window.scrollTo({top:0,behavior:"smooth"})};
+    L.appendChild(b);
+  });
+}
+var tm;
+function typed(){var e=edit();e.title=$("#title").value;e.text=$("#text").value;clearTimeout(tm);tm=setTimeout(function(){persist();renderList()},400)}
+$("#title").oninput=typed;$("#text").oninput=typed;
+$("#font").onchange=function(){edit().font=this.value;persist();render()};
+$("#date").onchange=function(){if(this.value){cur=this.value;render()}};
+function shift(n){var d=new Date(cur+"T00:00:00");d.setDate(d.getDate()+n);cur=dstr(d);render()}
+$("#prev").onclick=function(){shift(-1)};$("#next").onclick=function(){shift(1)};
+$("#todayBtn").onclick=function(){cur=dstr(new Date());render()};
+
+if("serviceWorker" in navigator){window.addEventListener("load",function(){navigator.serviceWorker.register("sw.js").catch(function(){})})}
+
+lock();
+</script>
+</body>
+</html>
